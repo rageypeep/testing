@@ -46,7 +46,7 @@ const VideoPlayer = ({ src }) => {
   const getAverageColor = (data) => {
     let r = 0, g = 0, b = 0;
     const length = data.length;
-    const blockSize = 1; // Sample rate, 1 = every pixel, 2 = every other pixel, etc. 1 is very extrem, 5 is a good vaule for perfomance.
+    const blockSize = 1; // Sample rate, 1 = every pixel, 2 = every other pixel, etc. 1 is very extreme, 5 is a good vaule for perfomance.
     let count = 0;
 
     for (let i = 0; i < length; i += 4 * blockSize) {
