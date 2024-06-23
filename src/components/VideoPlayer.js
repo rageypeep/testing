@@ -23,30 +23,39 @@ const VideoPlayer = ({ src }) => {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const color = getAverageColor(frame.data);
-      console.log('Extracted color:', color);
       setBoxShadow(`0 0 200px rgba(${color.r}, ${color.g}, ${color.b}, 1)`); // The first 2 numbers are the spread offset, the 3rd (200px) is the blur radius, then the RGB values, the last is the opacity value.
     };
 
-    const interval = setInterval(() => {
-      if (video.paused || video.ended) {
-        clearInterval(interval);
-        return;
-      }
+    const handlePlay = () => {
       extractColor();
-    }, 1000);
+      const interval = setInterval(() => {
+        if (video.paused || video.ended) {
+          clearInterval(interval);
+          return;
+        }
+        extractColor();
+      }, 250); // This is how often you want to extract the color in milliseconds.
 
-    video.addEventListener('play', extractColor);
+      video.addEventListener('pause', () => clearInterval(interval));
+      video.addEventListener('ended', () => {
+        clearInterval(interval);
+        setBoxShadow(''); // Optionally reset the glow when video ends
+      });
+    };
+
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('loadeddata', extractColor); // Extract color when the video is loaded
 
     return () => {
-      clearInterval(interval);
-      video.removeEventListener('play', extractColor);
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('loadeddata', extractColor);
     };
   }, []);
 
   const getAverageColor = (data) => {
     let r = 0, g = 0, b = 0;
     const length = data.length;
-    const blockSize = 1; // Sample rate, 1 = every pixel, 2 = every other pixel, etc. 1 is very extreme, 5 is a good vaule for perfomance.
+    const blockSize = 5; // Sample rate, 1 = every pixel, 2 = every other pixel, etc. 1 is very extreme, 5 is a good vaule for perfomance.
     let count = 0;
 
     for (let i = 0; i < length; i += 4 * blockSize) {

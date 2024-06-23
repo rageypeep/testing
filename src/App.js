@@ -1,25 +1,16 @@
 // src/App.js
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import VideoPlayer from './components/VideoPlayer';
+import Header from './components/Header';
 
 const App = () => {
   return (
     <Router>
       <div>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/video">Video Player</Link>
-            </li>
-          </ul>
-        </nav>
-
+        <Header />
         <Routes>
-          <Route path="/video" element={<VideoPlayer src="video/Overwatch2.webm" />} />
+          <Route path="/video" element={<VideoPlayer src="/video/Overwatch2.webm" />} />
           <Route path="/" element={<h1>Home Page</h1>} />
         </Routes>
       </div>
