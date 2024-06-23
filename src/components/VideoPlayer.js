@@ -24,7 +24,7 @@ const VideoPlayer = ({ src }) => {
       const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const color = getAverageColor(frame.data);
       console.log('Extracted color:', color);
-      setBoxShadow(`0 0 200px rgba(${color.r}, ${color.g}, ${color.b}, 1)`);
+      setBoxShadow(`0 0 200px rgba(${color.r}, ${color.g}, ${color.b}, 1)`); // The first 2 numbers are the spread offset, the 3rd (200px) is the blur radius, then the RGB values, the last is the opacity value.
     };
 
     const interval = setInterval(() => {
@@ -46,7 +46,7 @@ const VideoPlayer = ({ src }) => {
   const getAverageColor = (data) => {
     let r = 0, g = 0, b = 0;
     const length = data.length;
-    const blockSize = 1; // Only sample every 5th pixel for performance reasons
+    const blockSize = 1; // Sample rate, 1 = every pixel, 2 = every other pixel, etc. 1 is very extrem, 5 is a good vaule for perfomance.
     let count = 0;
 
     for (let i = 0; i < length; i += 4 * blockSize) {
