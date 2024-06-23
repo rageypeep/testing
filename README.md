@@ -5,4 +5,4 @@ Most of the componetns here are me trying to work out how things I have seen on 
 
 
 ### VideoPlayer.js
-I have often wondered how YouTube does its background glow on its videos, this React script scans a <video> tag then updates the <div> videoContainer with the average colour by changing the CSS box shadow value.
+I have often wondered how YouTube does its background glow on its videos, this React script scans a <canvas> tag then updates the <div> videoContainer with the average colour by changing the CSS box shadow value.
