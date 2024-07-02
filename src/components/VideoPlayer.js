@@ -22,8 +22,14 @@ const VideoPlayer = ({ src }) => {
     const extractColor = () => {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const color = getAverageColor(frame.data);
-      setBoxShadow(`0 0 200px rgba(${color.r}, ${color.g}, ${color.b}, 1)`); // The first 2 numbers are the spread offset, the 3rd (200px) is the blur radius, then the RGB values, the last is the opacity value.
+      const colors = getEdgeColors(frame.data, canvas.width, canvas.height);
+      // The 3rd value of the box shadow, sets the blur radius. 200px is extreme, but shows off the effect.
+      setBoxShadow(`
+        0 -20px 200px -20px rgba(${colors.top.r}, ${colors.top.g}, ${colors.top.b}, 1), 
+        0 20px 200px -20px rgba(${colors.bottom.r}, ${colors.bottom.g}, ${colors.bottom.b}, 1), 
+        -20px 0 200px -20px rgba(${colors.left.r}, ${colors.left.g}, ${colors.left.b}, 1), 
+        20px 0 200px -20px rgba(${colors.right.r}, ${colors.right.g}, ${colors.right.b}, 1)
+      `);
     };
 
     const handlePlay = () => {
@@ -52,24 +58,46 @@ const VideoPlayer = ({ src }) => {
     };
   }, []);
 
-  const getAverageColor = (data) => {
-    let r = 0, g = 0, b = 0;
-    const length = data.length;
-    const blockSize = 5; // Sample rate, 1 = every pixel, 2 = every other pixel, etc. 1 is very extreme, 5 is a good vaule for perfomance.
-    let count = 0;
+  const getEdgeColors = (data, width, height) => {
+    const getAverageColor = (indices) => {
+      let r = 0, g = 0, b = 0;
+      let count = 0;
 
-    for (let i = 0; i < length; i += 4 * blockSize) {
-      r += data[i];
-      g += data[i + 1];
-      b += data[i + 2];
-      count++;
+      for (let i = 0; i < indices.length; i++) {
+        r += data[indices[i]];
+        g += data[indices[i] + 1];
+        b += data[indices[i] + 2];
+        count++;
+      }
+
+      r = Math.floor(r / count);
+      g = Math.floor(g / count);
+      b = Math.floor(b / count);
+
+      return { r, g, b };
+    };
+
+    const topIndices = [];
+    const bottomIndices = [];
+    const leftIndices = [];
+    const rightIndices = [];
+
+    for (let x = 0; x < width; x++) {
+      topIndices.push((x + 0 * width) * 4);
+      bottomIndices.push((x + (height - 1) * width) * 4);
     }
 
-    r = Math.floor(r / count);
-    g = Math.floor(g / count);
-    b = Math.floor(b / count);
+    for (let y = 0; y < height; y++) {
+      leftIndices.push((0 + y * width) * 4);
+      rightIndices.push(((width - 1) + y * width) * 4);
+    }
 
-    return { r, g, b };
+    return {
+      top: getAverageColor(topIndices),
+      bottom: getAverageColor(bottomIndices),
+      left: getAverageColor(leftIndices),
+      right: getAverageColor(rightIndices),
+    };
   };
 
   return (
