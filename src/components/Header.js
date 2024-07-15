@@ -13,6 +13,9 @@ function Header() {
           <li>
             <Link to="/video">Video Player</Link>
           </li>
+          <li>
+            <Link to="/voxel">Voxel Test</Link>
+          </li>
         </ul>
       </nav>
     )
